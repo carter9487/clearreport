@@ -6,8 +6,8 @@ include_once(PATH_LIB . "db.inc");
 
 
 //$invoice_id = 100080240; //要開始清除的invoice_id
-$invoice_time = date("Y-m-01 00:00:00", strtotime(date("y-m-d h:i:s")."-6 month"));
-$month = date("m01", strtotime(date("y-m-d h:i:s")."-6 month"));
+$invoice_time = date("Y-m-04 00:00:00", strtotime(date("y-m-d h:i:s")."-6 month"));
+$month = date("m04", strtotime(date("y-m-d h:i:s")."-6 month"));
 //$invoice_time = '2020-09-01 00:00:00'; //要開始清除的日期
 
 echo 'create table start'."\r\n";
@@ -29,8 +29,9 @@ db_read("CREATE TABLE `__del_game_".$month."` (
 ENGINE=MyISAM
 COLLATE='utf8_general_ci';", null, true);
 
-$create_sql = db_read("select `id` from __del_bet_".$month.";", null, true);
-if(count($create_sql['affected']>0)){
+$create_sql = db_read("SHOW TABLES LIKE '__del_bet_".$month."';", null, true);
+
+if($create_sql['count']>0){
     echo 'create table err __del_bet'."\r\n";
     exit;
 }
@@ -38,8 +39,8 @@ db_read("CREATE TABLE `__del_bet_".$month."` (
 	`id` INT ,PRIMARY KEY (  id )
 );", null, true);
 
-$create_sql = db_read("select `id` from __del_change_".$month.";", null, true);
-if(count($create_sql['affected']>0)){
+$create_sql = db_read("SHOW TABLES LIKE '__del_change_".$month."';", null, true);
+if($create_sql['count']>0){
     echo 'create table err __del_change'."\r\n";
     exit;
 }
@@ -212,7 +213,7 @@ echo 'delete Deposit_change end'."\r\n";
 
 //刪除debug_log
 echo 'delete debug_log start'."\r\n";
-$info_sql = "delete from `debug_log` where `created_at` < unix_timestamp('".$invoice_time."')";
+$info_sql = "delete from `debug_log` where `time` < '".$invoice_time."'";
 $info_res = db_write($info_sql);
 //var_dump($info_sql);
 echo 'delete debug_log end'."\r\n";
